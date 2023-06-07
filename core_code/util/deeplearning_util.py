@@ -5,6 +5,9 @@ from torch.nn import Conv2d
 from pathlib import Path
 from datetime import datetime
 from torch import nn
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn import metrics
 
 def train_one_epoch(model, train_loader, optimizer, loss_functions, device):
     #This is the main code responsible for updating the weights of the model for a single epoch
@@ -63,6 +66,37 @@ def calculate_validation_loss(model, validation_loader, loss_functions, device):
         val_loss /= len(validation_loader.dataset)
         
     return val_loss
+
+def calculate_test_performance(model, test_loader, device):
+    model.eval() #set the model in evaluation mode
+    
+    ground_truth_labels = np.array([])
+    network_labels = np.array([])
+    with torch.no_grad():  # disable gradient calculations during evaluation
+        for batch in test_loader: 
+            imgs, targets = batch #getting imgs and target output for current batch
+            
+            #we have a tensor in the validation_loader, move to device
+            imgs = imgs.to(device= device, dtype = torch.float32)
+            targets = targets.to(device= device, dtype = torch.float32)
+            
+            network_output = model(imgs) #applying the model to the input images
+            
+            #targets is shape [B,C,1] changing to [B,C] and getting the class label
+            targets_class = torch.argmax(torch.squeeze(targets, dim = -1), dim=1).cpu().numpy()
+            
+            
+            #output from model is [B,C]. Calculate network labels
+            network_output = torch.argmax(torch.sigmoid(network_output), dim=1).cpu().numpy()
+                        
+            ground_truth_labels = np.hstack((ground_truth_labels, targets_class) )
+            network_labels = np.hstack((network_labels, network_output) )
+            
+    confusion_matrix = metrics.confusion_matrix(ground_truth_labels, network_labels)
+    
+    print(confusion_matrix)    
+    
+    return 0
 
 def get_model_outputdir(model_output_folder):
     if not model_output_folder:
