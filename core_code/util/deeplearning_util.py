@@ -5,7 +5,6 @@ from torch.nn import Conv2d
 from pathlib import Path
 from datetime import datetime
 from torch import nn
-import matplotlib.pyplot as plt
 import numpy as np
 from sklearn import metrics
 
@@ -112,20 +111,9 @@ def load_model(model_path, device = 'cpu'):
     n_channels_input = state_dict[list(state_dict.keys())[0]].size(1)
     n_classes = state_dict[list(state_dict.keys())[-1]].size(0)
     
-    model = torchvision.models.resnet50()
+    model = get_model('resnet50', n_channels_input, n_classes).to(device= device)
     
-    #Adjust the conv1 to the number of input channels
-    model.conv1 = Conv2d(n_channels_input, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
-    
-    
-    #Adjust the fc to the number of output classes
-    model.fc = torch.nn.Sequential(
-        torch.nn.Linear(
-            in_features=2048,
-            out_features= n_classes
-        ),
-        torch.nn.Sigmoid()
-    )
+    model.load_state_dict(state_dict)
     
     return model
 
