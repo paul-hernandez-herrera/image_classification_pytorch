@@ -1,7 +1,7 @@
 import argparse, torch, copy, platform
 from pathlib import Path
 from torch.utils.tensorboard import SummaryWriter
-from .util.deeplearning_util import train_one_epoch, calculate_validation_loss, get_model_outputdir
+from .util.deeplearning_util import train_one_epoch, calculate_validation_loss, load_model, get_model_outputdir
 
 
 
@@ -54,6 +54,10 @@ def train_model(model,
     writer.close()
     torch.save(model.state_dict(), Path(output_dir, f"{model_id}.last_model_e{epochs}.pth"))
     torch.save(best_model_state_dict, Path(output_dir, f"{model_id}.best_model_e{best_epoch}.pth"))
+    
+    #returning the model with the best performance in validation
+    model = load_model(Path(output_dir, f"{model_id}.best_model_e{best_epoch}.pth"), device = device)
+    
     return model             
         
 
