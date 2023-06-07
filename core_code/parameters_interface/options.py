@@ -81,10 +81,10 @@ def get_data_augmentation(data_augmentation_flag = True, **kargs):
 
 ###################################################################
 
-def get_training_data(train_dataset, val_par, test_par):
+def get_split_training_val_test_sets(train_dataset, val_par, test_par):
     train_dataset = copy.deepcopy(train_dataset)
-    train_dataset, val_set = get_custom_dataset(train_dataset, val_par, test_par)
-    train_dataset, test_set = get_custom_dataset(train_dataset, test_par, val_par)    
+    train_dataset, val_set = split_dataset(train_dataset, val_par, test_par)
+    train_dataset, test_set = split_dataset(train_dataset, test_par, val_par)    
     #validation and training set to be use without dataaugmentation
     if (val_par["type"]=='percentage_training_set') and (test_par["type"]=='percentage_training_set'):
         perc1 = val_par["per_val"]
@@ -98,7 +98,7 @@ def get_training_data(train_dataset, val_par, test_par):
         val_set.dataset.set_data_augmentation(augmentation_flag = False)
     return train_dataset, val_set, test_set
 
-def get_custom_dataset(train_dataset, parameters_1, parameters_2):
+def split_dataset(train_dataset, parameters_1, parameters_2):
     if parameters_1["type"] == 'None':
         return train_dataset, None
     elif parameters_1["type"] == 'folder_path':
