@@ -5,7 +5,6 @@ from ..Dataset.data_augmentation_classification import augmentation_classificati
 from typing import Dict
 from torch.nn import CrossEntropyLoss
 from ..Dataset.Dataset import CustomImageDataset
-from torch import Generator
 from torch.utils.data import random_split
 from torch.utils.data.dataset import Subset
 import copy
@@ -89,7 +88,7 @@ def get_split_training_val_test_sets(train_dataset, val_par, test_par):
     if (val_par["type"]=='percentage_training_set') and (test_par["type"]=='percentage_training_set'):
         perc1 = val_par["per_val"]
         perc2 = test_par["per_val"]
-        train_dataset, val_set, test_set = random_split(train_dataset, [1-perc1-perc2, perc1, perc2], generator= Generator().manual_seed(1))
+        train_dataset, val_set, test_set = random_split(train_dataset, [1-perc1-perc2, perc1, perc2])
         
     train_dataset = copy.deepcopy(train_dataset)
     if val_set: 
@@ -105,5 +104,5 @@ def split_dataset(train_dataset, parameters_1, parameters_2):
         return train_dataset, CustomImageDataset(parameters_1["folder_input_list"])
     elif parameters_1["type"]=='percentage_training_set' and parameters_2["type"]=='None':
         perc1 = parameters_1["per_val"]
-        return random_split(train_dataset, [1-perc1, perc1], generator= Generator().manual_seed(1))
+        return random_split(train_dataset, [1-perc1, perc1])
     return train_dataset, None
