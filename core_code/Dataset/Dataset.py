@@ -80,6 +80,10 @@ class CustomImageDataset(Dataset):
         """
         self.data_augmentation_flag = augmentation_flag
         self.data_augmentation_object = data_augmentation_object
+        if not(augmentation_flag):
+            self.data_augmentation_object = None
+        
+        
 
 def check_training_set_equal_img_sizes(path_files):
     #verify that every image has the same shape
