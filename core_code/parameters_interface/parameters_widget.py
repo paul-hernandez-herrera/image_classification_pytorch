@@ -3,8 +3,6 @@ import torch
 from IPython.display import display
 from ..Dataset.data_augmentation_classification import augmentation_classification_task
 from . import ipwidget_basic
-from . import options
-
     
 ################################################################################
 
@@ -221,16 +219,16 @@ class parameters_validation_testing_set():
                  n_classes,
                  dropdown_default = 'percentage_training_set'):
         # options for loss functions
-        options = [
+        options_dropdown = [
             ('% of training set', 'percentage_training_set'),
             ('Folder paths', 'folder_path'),
             ('None', 'None')
             ]
         
-        index = next((i for i, option in enumerate(options) if option[1] == dropdown_default), None)
-        options.insert(0, options.pop(index))
+        index = next((i for i, option in enumerate(options_dropdown) if option[1] == dropdown_default), None)
+        options_dropdown.insert(0, options_dropdown.pop(index))
         
-        self.validation_w = ipwidget_basic.set_dropdown(dropdown_label, options)
+        self.validation_w = ipwidget_basic.set_dropdown(dropdown_label, options_dropdown)
         
         self.perc_training_set = ipwidget_basic.set_Float_Bounded(' ', 0.05, 0, 1, 0.01)
         self.folder_input_w = []
@@ -301,19 +299,18 @@ class parameters_data_augmentation():
             self.main_container.children = [self.data_augmentation_flag_w, self.options_container]
         else:
             self.main_container.children = [self.data_augmentation_flag_w]
-            
-    def get(self):        
-        data_augmentation = options.get_data_augmentation(
-            enable_hflip = self.hflip_flag_w.value, 
-            enable_vflip = self.vflip_flag_w.value, 
-            enable_shear = self.shear_flag_w.value, 
-            enable_zoom = self.zoom_flag_w.value, 
-            shear_angle = self.shear_angle_w.value, 
-            zoom_range = self.zoom_range_w.value, 
-            data_augmentation_flag = self.data_augmentation_flag_w.value)
-            
-        return {"data_augmentation_flag"   : self.data_augmentation_flag_w.value,
-                "data_augmentation_object" : data_augmentation}
+         
+    def get(self):
+        parameters = {
+            'enable_data_augmentation': self.data_augmentation_flag_w.value,
+            'enable_hflip': self.hflip_flag_w.value,
+            'enable_vflip': self.vflip_flag_w.value, 
+            'enable_shear': self.shear_flag_w.value, 
+            'enable_zoom': self.shear_flag_w.value, 
+            'shear_angle': self.shear_angle_w.value,  
+            'zoom_range': self.zoom_range_w.value
+            }
+        return parameters
     
 class parameters_model_saving():
     def __init__(self):
