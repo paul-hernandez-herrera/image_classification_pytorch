@@ -7,6 +7,7 @@ from datetime import datetime
 from torch import nn
 import numpy as np
 from sklearn import metrics
+from ..util import util
 
 def train_one_epoch(model, train_loader, optimizer, loss_functions, device):
     #This is the main code responsible for updating the weights of the model for a single epoch
@@ -66,11 +67,17 @@ def calculate_validation_loss(model, validation_loader, loss_functions, device):
         
     return val_loss
 
-def calculate_test_performance(model, test_loader, device):
+def calculate_test_performance(model, test_loader, device, folder_output = None):
     model.eval() #set the model in evaluation mode
     
     ground_truth_labels = np.array([])
     network_labels = np.array([])
+    
+    #index and file_names from test images
+    index = np.array(test_loader.dataset.indices)
+    file_names = [test_loader.dataset.dataset.path_files[i].stem for i in index]
+    
+    k = 0
     with torch.no_grad():  # disable gradient calculations during evaluation
         for batch in test_loader: 
             imgs, targets = batch #getting imgs and target output for current batch
@@ -91,9 +98,25 @@ def calculate_test_performance(model, test_loader, device):
             ground_truth_labels = np.hstack((ground_truth_labels, targets_class) )
             network_labels = np.hstack((network_labels, network_output) )
             
+            #saving image and prediction
+            for j in range(0, len(targets_class)):
+                current_output = network_output[j]
+                current_target = targets_class[j]
+                
+                # Calculate probability map and convert to numpy array
+                file_id = file_names[k]
+                k+=1
+                
+                util.imwrite(Path(folder_output, f'{file_id}_pred_{current_output}_target_{current_target}.tif'), (255*imgs[j,:,:,:]).cpu().numpy().astype(np.uint8))
+    
+    for i in range(0, len(file_names)):
+        print(f'{file_names[i]} --- (gt, predicted) = ({ground_truth_labels[i]}, {network_labels[i]})')
+            
     confusion_matrix = metrics.confusion_matrix(ground_truth_labels, network_labels)
     
     print(confusion_matrix)    
+    
+    
     
     return 0
 
@@ -175,5 +198,12 @@ def get_model(model_type, n_channels_input, out_features):
                              out_features= out_features
                              )
         return model
+    
+def get_dataloader_file_names(dataset_loader, fullpath = True):
+    #index and file_names from test images
+    index = np.array(dataset_loader.dataset.indices)
+    file_names = [dataset_loader.dataset.dataset.path_files[i] if fullpath else dataset_loader.dataset.dataset.path_files[i].stem for i in index]
+    
+    return file_names
     
     
