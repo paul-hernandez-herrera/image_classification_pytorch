@@ -13,7 +13,7 @@ class CustomImageDataset(Dataset):
     The purpose of this class is to load input and target image pairs from two separate directories, 
     preprocess the input image if required, and return them as a tuple of PyTorch tensors.    
     """
-    def __init__(self, list_folders, enable_preprocess = False):
+    def __init__(self, list_folders, enable_preprocess = False, resize = None):
         valid_suffix = {".tif", ".tiff"}
         self.enable_preprocess = enable_preprocess        
         self.data_augmentation_flag = False
@@ -28,7 +28,9 @@ class CustomImageDataset(Dataset):
             self.labels = np.vstack((self.labels, idx * np.ones((len(current_image_paths), 1))))
         
         #check if we need to resize images to a commun shape
-        self.resize = not check_training_set_equal_img_sizes(self.path_files)
+        self.resize = resize
+        if not self.resize:
+            self.resize = not check_training_set_equal_img_sizes(self.path_files)
         
         self.input_size = np.array([224, 224]) if self.resize else util.imread(self.path_files[idx]).shape[-2:]
         self.transform_resize = Resize((self.input_size[0], self.input_size[1]), antialias='True') if self.resize else None
