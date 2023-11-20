@@ -43,11 +43,11 @@ def convert_img_shape_to_C_W_H(img):
 ########################################################################################################
 ########################################################################################################
 
-def show_images_side_by_side_interactive(left_image_paths, right_image_paths):
+def show_images_predicted_class_interactive(img_file_paths, predicted_class):
     global main_container
     main_container = widgets.HBox()
     
-    dropdown_options = [(Path(file_name).name, str(idx)) for idx, file_name in enumerate(left_image_paths)] 
+    dropdown_options = [(Path(file_name).name, str(idx)) for idx, file_name in enumerate(img_file_paths)] 
     
     dropdown_w = set_dropdown('Image to show: ', dropdown_options)
 
@@ -56,88 +56,27 @@ def show_images_side_by_side_interactive(left_image_paths, right_image_paths):
         show_image(index)      
     
     def show_image(index):        
-        left_image, right_image  = imread(left_image_paths[index]), imread(right_image_paths[index])
-        
+        img  = imread(img_file_paths[index])
+        label_class = str(predicted_class[index])
+
         try:
-            show_image_napari(left_image, right_image)
+            show_image_napari(img, label_class)            
         except:
             main_container.close()
-            show_image_ipywidget(left_image, right_image) 
+            plt_imshow(img, label_class) 
             
-    def show_image_napari(image1, image2):
-        viewer = napari.Viewer()
-        viewer.add_image(image1)
-        viewer.add_image(image2)            
+    def show_image_napari(img, label_class):
+        viewer = napari.Viewer(title = f"Class predicted = {label_class}")
+        viewer.add_image(img)
             
-    def plt_imshow(image):
+    def plt_imshow(image, label_class):
+        if (len(image.shape) not in [2]) or (len(image.shape) == 3 and image.shape[0] not in [3]):
+            raise ValueError('Can not display current image.')            
+            
         plt.imshow(image, cmap='gray')
         plt.axis('off')
+        plt.title(f"Class predicted = {label_class}") 
         plt.show()
-            
-    def show_image_ipywidget(image1, image2):
-        global main_container
-        
-        def update_left_image(change):
-            left_checkbox.value = False
-            index = int(change.new) if change else 0
-            with output1:
-                output1.clear_output(wait=True)
-                plt_imshow(image1[index])
 
-    
-        def update_right_image(change):
-            right_checkbox.value = False
-            index = int(change.new) if change else 0
-            with output2:
-                output2.clear_output(wait=True)
-                plt_imshow(image2[index])
-                
-        def right_checkbox_handler(change):
-            if change.new == True:
-                with output2:
-                    output2.clear_output(wait=True)
-                    img_display = image2.copy()
-                    for ch in range(img_display.shape[0]):
-                        img_display[ch,:,:] = (ch+1)*img_display[ch,:,:]
-                    plt_imshow(img_display.max(axis=0))
-            else:
-                update_right_image(None)
-                
-        def left_checkbox_handler(change):
-            if change.new == True:
-                with output1:
-                    output1.clear_output(wait=True)
-                    plt_imshow(image1.max(axis=0))
-            else:
-                update_left_image(None)  
-    
-        output1 = widgets.Output()  
-        output2 = widgets.Output()
-    
-        left_slider = set_IntSlider('ch:', 0, 0, len(image1) - 1, show=False)
-        right_slider = set_IntSlider('ch:', 0, 0, len(image2) - 1, show=False)
-        
-        left_checkbox = set_checkbox(string_name = 'maximum intensity projection', default_value = False, show = False)
-        right_checkbox = set_checkbox(string_name = 'maximum intensity projection', default_value = False, show = False)
-    
-        left_container = widgets.VBox(children=[output1, left_slider, left_checkbox])
-        right_container = widgets.VBox(children=[output2, right_slider, right_checkbox])
-        main_container = widgets.HBox(children=[left_container, right_container])
-        
-        
-        update_left_image(None)
-        update_right_image(None)
-        display(main_container)            
-        
-        left_slider.observe(update_left_image, names='value')
-        right_slider.observe(update_right_image, names='value')
-        left_checkbox.observe(left_checkbox_handler, names='value')
-        right_checkbox.observe(right_checkbox_handler, names='value')        
-            
-        
     dropdown_w.observe(dropdown_handler, names='value')    
-    show_image(0)    
-    
-
-            
-
+    show_image(0)   
