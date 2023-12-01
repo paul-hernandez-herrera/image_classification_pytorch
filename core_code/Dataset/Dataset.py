@@ -33,7 +33,7 @@ class CustomImageDataset(Dataset):
             self.resize = not check_training_set_equal_img_sizes(self.path_files)
         
         self.input_size = np.array([224, 224]) if self.resize else util.imread(self.path_files[idx]).shape[-2:]
-        self.transform_resize = Resize((self.input_size[0], self.input_size[1]), antialias='True') if self.resize else None
+        self.transform_resize = Resize((int(self.input_size[0]), int(self.input_size[1])), antialias='True') if self.resize else None
         
         self.num_classes = len(self.list_folders)
         
