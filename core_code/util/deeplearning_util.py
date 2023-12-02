@@ -8,6 +8,7 @@ from torch import nn
 import numpy as np
 from sklearn import metrics
 from ..util import util
+from collections import OrderedDict
 
 def train_one_epoch(model, train_loader, optimizer, loss_functions, device):
     #This is the main code responsible for updating the weights of the model for a single epoch
@@ -136,7 +137,17 @@ def load_model(model_path, device = 'cpu'):
     
     model = get_model('resnet50', n_channels_input, n_classes).to(device= device)
     
-    model.load_state_dict(state_dict)
+    try:
+        model.load_state_dict(state_dict)
+    except:
+        new_state_dict = OrderedDict()
+        for k, v in state_dict.items():
+            
+            name = k[10:] # remove `module.`
+            new_state_dict[name] = v
+            print(k + "  --- " + name)
+        # load params
+        model.load_state_dict(new_state_dict)
     
     return model
 
