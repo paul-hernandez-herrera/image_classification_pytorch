@@ -8,6 +8,10 @@ The aim of this project is to implement the ResNet architecture for 2D image cla
 
 This Jupyter notebook provides all the necessary code to train a deep learning model for image segmentation. The user only needs to provide the training data.  *For more detailed explanations of each Jupyter notebook and instructions on how to use them, please refer to our wiki page. However, please note that the wiki page is currently under development and will be available soon.*
 
-### How to run the Jupyter Notebook in Google Colab?
+### How to Train the Jupyter Notebook in Google Colab?
 
 **Requires a gmail account**:   [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/paul-hernandez-herrera/image_classification_pytorch/blob/main/jupyter_notebook/Train_Image_Classification_Model.ipynb)
+
+### How to Predict the Jupyter Notebook in Google Colab?
+
+**Requires a gmail account**:   [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/paul-hernandez-herrera/image_classification_pytorch/blob/main/jupyter_notebook/Predict_Class_using_Trained_Model.ipynb)
