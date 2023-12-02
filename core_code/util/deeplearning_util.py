@@ -145,7 +145,6 @@ def load_model(model_path, device = 'cpu'):
             
             name = k[10:] # remove `module.`
             new_state_dict[name] = v
-            print(k + "  --- " + name)
         # load params
         model.load_state_dict(new_state_dict)
     
