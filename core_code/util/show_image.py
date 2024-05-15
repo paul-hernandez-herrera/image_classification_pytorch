@@ -15,7 +15,7 @@ def show_images_from_Dataset(custom_dataset, n_images_to_display=3):
     # Create figure with subplots for each image and its channels
     n_channels = custom_dataset[0][0].shape[0]
     fig, axs = plt.subplots(n_images_to_display, n_channels, figsize=(10, 20), dpi=80)
-    
+    axs = axs.flatten()
     for i in range(n_images_to_display):
         img, label = custom_dataset[np.random.randint(len(custom_dataset))]
         
@@ -24,10 +24,10 @@ def show_images_from_Dataset(custom_dataset, n_images_to_display=3):
         label = np.argmax(label)
         
         for j in range(n_channels):
-            axs[i,j].imshow(img[j], cmap='gray')
-            axs[i,j].set_title(f'Image {i} - Ch{j} ---- LABEL = {label}')
-            axs[i,j].axis('off')
-            fig.colorbar(axs[i,j].imshow(img[j], cmap='gray'), ax=axs[i,j])
+            axs[i*n_channels +j].imshow(img[j], cmap='gray')
+            axs[i*n_channels +j].set_title(f'Image {i} - Ch{j} ---- LABEL = {label}')
+            axs[i*n_channels +j].axis('off')
+            fig.colorbar(axs[i*n_channels +j].imshow(img[j], cmap='gray'), ax=axs[i*n_channels +j])
         
     plt.tight_layout()
     plt.show()    
