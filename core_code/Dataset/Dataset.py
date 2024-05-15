@@ -59,14 +59,12 @@ class CustomImageDataset(Dataset):
         #converting targets to one_hot encoding. [1,C]. Loss functions requires [C,1]
         target = one_hot(target, num_classes= self.num_classes).permute(1,0)
         
-        if self.resize:
-            input_img = self.transform_resize(input_img)
-
-
         #U-Net requires dimensions to be [C,W,H]. Make sure that we have Channel dimension
         input_img = input_img.unsqueeze(0) if input_img.dim() == 2 else input_img
-            
         
+        if self.resize:
+            input_img = self.transform_resize(input_img)
+                    
         if self.data_augmentation_flag:
             input_img = self.data_augmentation_object.run(input_img)
         
