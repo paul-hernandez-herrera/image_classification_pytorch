@@ -39,6 +39,7 @@ def predict_model(input_path, model= None, model_path = None, output_folder=None
             
             # reading image
             input_img = util.imread(current_img_path)
+            int_img_dtype = input_img.dtype
 
             #preprocess image if required
             if enable_preprocess:
@@ -47,11 +48,14 @@ def predict_model(input_path, model= None, model_path = None, output_folder=None
             # convert image to tensor
             input_img = torch.tensor(input_img.astype(np.float32)).float()
 
+            #Resnet requires dimensions to be [C,W,H]. Make sure that we have Channel dimension
+            input_img = input_img.unsqueeze(0) if input_img.dim() == 2 else input_img
+
             # resize img
             img = resize_img(input_img)
             
-            # convert to shape [B,C,W,H]
-            img = torch.tensor(input_img).unsqueeze(0).to(device=device)
+            # convert to shape [B,C,W,H] donde B = 1
+            img = img.unsqueeze(0).to(device=device)
 
             # Apply model to input image
             network_output = model(img) 
@@ -61,7 +65,7 @@ def predict_model(input_path, model= None, model_path = None, output_folder=None
             
             # Save output probability map as image
             output_file_path = Path(output_folder,  'class_' + str(output_class[0].astype(int)), current_img_path.name)
-            util.imwrite(output_file_path, input_img.cpu().numpy())
+            util.imwrite(output_file_path, input_img.cpu().numpy().astype(int_img_dtype))
             
             print(f"{output_file_path.name}  DONE")
             output_predicted_class.append(output_class)
